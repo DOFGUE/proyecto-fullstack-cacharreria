@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "seed:catalog": "node scripts/seed-catalog.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

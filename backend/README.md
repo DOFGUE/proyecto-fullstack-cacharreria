@@ -135,6 +135,11 @@ node scripts/encode-products.js
 El resultado se crea en `data/products-payload.json` y queda listo para enviarlo a `POST /api/products/bulk`.
 Los archivos de datos e imagenes estan excluidos de Git; el script y esta documentacion si se suben al repositorio.
 
+### Cargar el catalogo de ejemplo con imagenes
+
+El script `scripts/seed-catalog.js` carga las categorias, subcategorias y productos de ejemplo y vincula las imagenes de `../imagenes de proyecto 2/` por nombre de producto. Convierte cada JPG a una Data URL Base64 y la guarda en `Item.image`.
+Desde `backend`, ejecuta `npm run seed:catalog`. La carga es repetible y requiere que esa carpeta exista en la raiz del repositorio.
+
 ### Categorias y subcategorias
 
 ```text
