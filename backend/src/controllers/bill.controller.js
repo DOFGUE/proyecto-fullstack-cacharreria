@@ -17,45 +17,71 @@ const billPopulate = (query) => query
 const invalidId = (id) => !mongoose.Types.ObjectId.isValid(id)
 
 export const createBill = async (req, res) => {
+  const session = await mongoose.startSession()
   try {
-    const cart = await Cart.findOne({ user: req.user.id })
-    if (!cart) return res.status(404).json({ message: "Cart not found" })
-
-    const cartItems = await CartItem.find({ cart: cart._id }).populate("item")
-    if (!cartItems.length) return res.status(400).json({ message: "Cart is empty" })
-    if (cartItems.some((cartItem) => !cartItem.item)) {
-      return res.status(409).json({ message: "Cart contains an unavailable product" })
-    }
-    if (cartItems.some((cartItem) => cartItem.quantity > cartItem.item.stock)) {
-      return res.status(409).json({ message: "Insufficient product stock" })
-    }
-
-    const status = await Status.findOne({ name: "en tienda" })
-    if (!status) return res.status(500).json({ message: "Initial order status not found" })
-
-    const stockUpdates = cartItems.map((cartItem) => ({
-      updateOne: {
-        filter: { _id: cartItem.item._id, stock: { $gte: cartItem.quantity } },
-        update: { $inc: { stock: -cartItem.quantity } }
+    let billId
+    await session.withTransaction(async () => {
+      const cart = await Cart.findOne({ user: req.user.id }).session(session)
+      if (!cart) {
+        const error = new Error("Cart not found")
+        error.status = 404
+        throw error
       }
-    }))
-    const stockResult = await Item.bulkWrite(stockUpdates)
-    if (stockResult.modifiedCount !== cartItems.length) {
-      return res.status(409).json({ message: "Product stock changed, try again" })
-    }
 
-    const bill = await Bill.create({
-      cartItems: cartItems.map((cartItem) => cartItem._id),
-      user: req.user.id,
-      status: status._id,
-      description: req.body.description
+      const cartItems = await CartItem.find({ cart: cart._id }).populate("item").session(session)
+      if (!cartItems.length) {
+        const error = new Error("Cart is empty")
+        error.status = 400
+        throw error
+      }
+      if (cartItems.some((cartItem) => !cartItem.item)) {
+        const error = new Error("Cart contains an unavailable product")
+        error.status = 409
+        throw error
+      }
+      if (cartItems.some((cartItem) => cartItem.quantity > cartItem.item.stock)) {
+        const error = new Error("Insufficient product stock")
+        error.status = 409
+        throw error
+      }
+
+      const status = await Status.findOne({ name: "en tienda" }).session(session)
+      if (!status) {
+        const error = new Error("Initial order status not found")
+        error.status = 500
+        throw error
+      }
+
+      const stockUpdates = cartItems.map((cartItem) => ({
+        updateOne: {
+          filter: { _id: cartItem.item._id, stock: { $gte: cartItem.quantity } },
+          update: { $inc: { stock: -cartItem.quantity } }
+        }
+      }))
+      const stockResult = await Item.bulkWrite(stockUpdates, { session })
+      if (stockResult.modifiedCount !== cartItems.length) {
+        const error = new Error("Product stock changed, try again")
+        error.status = 409
+        throw error
+      }
+
+      const [bill] = await Bill.create([{
+        cartItems: cartItems.map((cartItem) => cartItem._id),
+        user: req.user.id,
+        status: status._id,
+        description: req.body.description
+      }], { session })
+      billId = bill._id
+
+      await Cart.deleteOne({ _id: cart._id }).session(session)
+      await Cart.create([{ user: req.user.id }], { session })
     })
 
-    await Cart.deleteOne({ _id: cart._id })
-    await Cart.create({ user: req.user.id })
-    return res.status(201).json(await billPopulate(Bill.findById(bill._id)))
+    return res.status(201).json(await billPopulate(Bill.findById(billId)))
   } catch (error) {
-    return res.status(500).json({ message: error.message })
+    return res.status(error.status || 500).json({ message: error.message })
+  } finally {
+    await session.endSession()
   }
 }
 

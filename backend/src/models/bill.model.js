@@ -8,4 +8,7 @@ const billSchema = new mongoose.Schema({
   description: { type: String, trim: true }
 }, { timestamps: true })
 
+billSchema.index({ user: 1, date: -1 })
+billSchema.index({ status: 1 })
+
 export default mongoose.model("Bill", billSchema)

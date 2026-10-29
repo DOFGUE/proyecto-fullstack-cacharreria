@@ -3,11 +3,12 @@ import { register, login, logout, profile, updateProfile, deleteProfile } from "
 import { authRequired } from "../middlewares/validateToken.js"
 import { validateSchema } from "../middlewares/validator.middleware.js"
 import { registerSchema, loginSchema, updateUserSchema } from "../schema/auth.schema.js"
+import { authLimiter } from "../middlewares/rate-limiters.js"
 
 const router = Router()
 
-router.post("/register", validateSchema(registerSchema), register)
-router.post("/login", validateSchema(loginSchema), login)
+router.post("/register", authLimiter, validateSchema(registerSchema), register)
+router.post("/login", authLimiter, validateSchema(loginSchema), login)
 router.post("/logout", logout)
 router.get("/profile", authRequired, profile)
 router.patch("/profile", authRequired, validateSchema(updateUserSchema), updateProfile)

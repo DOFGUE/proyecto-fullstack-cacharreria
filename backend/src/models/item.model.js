@@ -9,4 +9,7 @@ const itemSchema = new mongoose.Schema({
   stock: { type: Number, required: true, min: 0, default: 0 }
 }, { timestamps: true })
 
+itemSchema.index({ subCategory: 1, name: 1 }, { unique: true })
+itemSchema.index({ name: 1 })
+
 export default mongoose.model("Item", itemSchema)

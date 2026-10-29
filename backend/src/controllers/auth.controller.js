@@ -2,7 +2,18 @@ import bcrypt from "bcrypt"
 import User from "../models/user.model.js"
 import Role from "../models/role.model.js"
 import Address from "../models/address.model.js"
+import Cart from "../models/cart.model.js"
+import CartItem from "../models/cartItem.model.js"
 import { createAccessToken } from "../libs/jwt.js"
+
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  secure: process.env.NODE_ENV === "production",
+  maxAge: 24 * 60 * 60 * 1000
+}
+
+const expiredCookieOptions = { ...cookieOptions, maxAge: 0, expires: new Date(0) }
 
 const publicUser = (user) => ({
   id: user._id,
@@ -20,7 +31,7 @@ const publicUser = (user) => ({
 const setSession = async (res, user) => {
   const token = await createAccessToken({ id: user._id.toString() })
   res.setHeader("Authorization", `Bearer ${token}`)
-  res.cookie("token", token, { httpOnly: true })
+  res.cookie("token", token, cookieOptions)
 }
 
 export const register = async (req, res) => {
@@ -67,7 +78,7 @@ export const login = async (req, res) => {
 }
 
 export const logout = (req, res) => {
-  res.cookie("token", "", { expires: new Date(0), httpOnly: true })
+  res.cookie("token", "", expiredCookieOptions)
   return res.sendStatus(200)
 }
 
@@ -107,8 +118,11 @@ export const deleteProfile = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.user.id)
     if (!user) return res.status(404).json({ message: "User not found" })
+    const carts = await Cart.find({ user: user._id }, { _id: 1 })
+    await CartItem.deleteMany({ cart: { $in: carts.map((cart) => cart._id) } })
+    await Cart.deleteMany({ user: user._id })
     await Address.findOneAndDelete({ user: user._id })
-    res.cookie("token", "", { expires: new Date(0), httpOnly: true })
+    res.cookie("token", "", expiredCookieOptions)
     return res.json({ message: "User deleted successfully" })
   } catch (error) {
     return res.status(500).json({ message: error.message })

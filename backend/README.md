@@ -21,11 +21,49 @@ Edita `.env` y configura estos valores:
 
 ```env
 PORT=4000
-MONGO_URI=mongodb://localhost:27017/proyecto_cacharreria
+MONGO_URI=mongodb://127.0.0.1:27017/proyecto_cacharreria?replicaSet=rs0
 TOKEN_SECRET=una-clave-larga-y-segura
+NODE_ENV=development
+FRONTEND_ORIGINS=http://localhost:3000,http://localhost:5173
 ```
 
 El archivo `.env` no debe subirse a GitHub. Solo se debe compartir `.env.example`.
+
+### MongoDB local como Replica Set
+
+La creación de facturas usa una transacción para descontar inventario, guardar la
+factura y renovar el carrito de forma atómica. Por eso MongoDB debe ejecutarse como
+Replica Set o mediante MongoDB Atlas.
+
+En Linux, agrega esta sección a `/etc/mongod.conf`:
+
+```yaml
+replication:
+  replSetName: rs0
+```
+
+Reinicia el servicio:
+
+```bash
+sudo systemctl restart mongod
+```
+
+Inicializa el Replica Set una sola vez:
+
+```bash
+mongosh
+```
+
+```javascript
+rs.initiate({
+  _id: "rs0",
+  members: [{ _id: 0, host: "127.0.0.1:27017" }]
+})
+```
+
+Verifica el estado con `rs.status()` y confirma que el nodo aparezca como
+`PRIMARY`. La URI debe contener `?replicaSet=rs0`. Esta configuración no elimina
+las bases de datos existentes.
 
 ## Ejecucion
 
@@ -42,6 +80,8 @@ npm start
 ```
 
 La API queda disponible en `http://localhost:4000` si se usa el puerto predeterminado.
+El estado de la API se puede comprobar en `GET /health`. Si el frontend usa otro origen,
+agregalo a `FRONTEND_ORIGINS`, separado por comas.
 Al iniciar, se crean automaticamente los estados `en tienda`, `enviado` y `entregado` si no existen.
 
 ## Autenticacion
@@ -183,6 +223,25 @@ en tienda -> enviado -> entregado
 ```
 
 No se permiten saltos de estado ni regresar a un estado anterior.
+
+La creación de facturas, el descuento de inventario y la renovación del carrito se
+ejecutan dentro de una transacción de MongoDB. En producción, MongoDB debe ejecutarse
+como replica set o mediante MongoDB Atlas, ya que las transacciones no funcionan en
+una instancia standalone.
+
+### Pruebas
+
+Desde `backend`, ejecuta:
+
+```bash
+npm test
+```
+
+### Seguridad y despliegue
+
+El backend configura CORS con credenciales, cookies HTTP-only, headers de seguridad,
+limitación de intentos para registro/login y apagado ordenado. En producción usa
+HTTPS, establece `NODE_ENV=production` y define explícitamente `FRONTEND_ORIGINS`.
 
 ## Estructura principal
 

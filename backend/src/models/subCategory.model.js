@@ -6,4 +6,6 @@ const subCategorySchema = new mongoose.Schema({
   description: { type: String, trim: true }
 }, { timestamps: true })
 
+subCategorySchema.index({ category: 1, name: 1 }, { unique: true })
+
 export default mongoose.model("SubCategory", subCategorySchema)

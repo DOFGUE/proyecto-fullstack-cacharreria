@@ -14,7 +14,44 @@ const validateSubCategories = async (products) => {
 
 export const getProducts = async (req, res) => {
   try {
-    return res.json(await Item.find().populate({ path: "subCategory", populate: "category" }))
+    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1)
+    const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 100, 1), 100)
+    const filter = {}
+
+    if (req.query.subCategory) {
+      if (invalidId(req.query.subCategory)) return res.status(400).json({ message: "Invalid subcategory id" })
+      filter.subCategory = req.query.subCategory
+    }
+
+    if (req.query.name) {
+      const escapedName = req.query.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+      filter.name = { $regex: escapedName, $options: "i" }
+    }
+
+    if (req.query.category) {
+      if (invalidId(req.query.category)) return res.status(400).json({ message: "Invalid category id" })
+      const subCategories = await SubCategory.find({ category: req.query.category }, { _id: 1 })
+      filter.subCategory = { $in: subCategories.map(({ _id }) => _id) }
+    }
+
+    if (req.query.available === "true") filter.stock = { $gt: 0 }
+    if (req.query.available === "false") filter.stock = 0
+
+    const [products, total] = await Promise.all([
+      Item.find(filter)
+        .populate({ path: "subCategory", populate: "category" })
+        .sort({ name: 1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Item.countDocuments(filter)
+    ])
+    res.set({
+      "X-Total-Count": String(total),
+      "X-Page": String(page),
+      "X-Limit": String(limit),
+      "X-Total-Pages": String(Math.ceil(total / limit))
+    })
+    return res.json(products)
   } catch (error) {
     return res.status(500).json({ message: error.message })
   }

@@ -1,32 +1,23 @@
-import express from "express"
-import morgan from "morgan"
-import cookieParser from "cookie-parser"
+import http from "node:http"
+import mongoose from "mongoose"
 import { connectDB } from "./db.js"
 import { PORT } from "./config.js"
-import authRoutes from "./routers/auth.routes.js"
-import productRoutes from "./routers/product.routes.js"
-import categoryRoutes from "./routers/category.routes.js"
-import subCategoryRoutes from "./routers/subCategory.routes.js"
-import cartRoutes from "./routers/cart.routes.js"
-import billRoutes from "./routers/bill.routes.js"
-import statusRoutes from "./routers/status.routes.js"
-
-const app = express()
-
-app.use(morgan("dev"))
-app.use(express.json({ limit: "20mb" }))
-app.use(cookieParser())
+import { createApp } from "./app.js"
 
 await connectDB()
 
-app.use("/api", authRoutes)
-app.use("/api", productRoutes)
-app.use("/api", categoryRoutes)
-app.use("/api", subCategoryRoutes)
-app.use("/api", cartRoutes)
-app.use("/api", billRoutes)
-app.use("/api", statusRoutes)
+const server = http.createServer(createApp())
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`)
 })
+
+const shutdown = async (signal) => {
+  console.log(`${signal} received, shutting down`)
+  await new Promise((resolve) => server.close(resolve))
+  await mongoose.disconnect()
+  process.exit(0)
+}
+
+process.once("SIGINT", shutdown)
+process.once("SIGTERM", shutdown)
