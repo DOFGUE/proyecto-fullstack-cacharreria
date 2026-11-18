@@ -237,6 +237,30 @@ Desde `backend`, ejecuta:
 npm test
 ```
 
+### Entorno de pruebas independiente
+
+El entorno de pruebas utiliza `proyecto_cacharreria_test` y nunca carga `.env`
+cuando `NODE_ENV=test`.
+
+1. Copia `.env.test.example` como `.env.test`.
+2. Sustituye los valores locales y secretos exclusivamente de prueba.
+3. Ejecuta el backend de pruebas:
+
+```bash
+npm run dev:test
+```
+
+Crear o limpiar los datos de prueba, solamente después de autorización explícita:
+
+```bash
+npm run setup:test
+npm run cleanup:test
+```
+
+Los scripts verifican que el nombre de MongoDB termine exactamente en `_test`.
+La limpieza elimina únicamente documentos marcados con el identificador interno
+`phase6-test-fixture`.
+
 ### Seguridad y despliegue
 
 El backend configura CORS con credenciales, cookies HTTP-only, headers de seguridad,

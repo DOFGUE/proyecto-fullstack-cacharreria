@@ -6,6 +6,7 @@ import Category from "../src/models/category.model.js"
 import SubCategory from "../src/models/subCategory.model.js"
 import Item from "../src/models/item.model.js"
 import { MONGO_URI } from "../src/config.js"
+import { databaseNameFromUri } from "../src/test-db.guard.js"
 
 // Precios de referencia en pesos colombianos (COP), editables para ajustarlos al inventario real.
 const catalog = [
@@ -301,6 +302,11 @@ const loadCatalogImages = async () => {
 }
 
 const seedCatalog = async () => {
+  const databaseName = databaseNameFromUri(MONGO_URI)
+  if (!databaseName?.endsWith("_test") && process.env.ALLOW_REAL_CATALOG_SEED !== "1") {
+    throw new Error("Refusing catalog seed against a non-_test database. Set ALLOW_REAL_CATALOG_SEED=1 only after explicit authorization.")
+  }
+
   const { images, missing } = await loadCatalogImages()
   await mongoose.connect(MONGO_URI)
 

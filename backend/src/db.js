@@ -1,6 +1,7 @@
 import mongoose from "mongoose"
 import Status from "./models/status.model.js"
 import { MONGO_URI } from "./config.js"
+import { assertTestDatabase } from "./test-db.guard.js"
 
 const defaultStatuses = ["en tienda", "enviado", "entregado"]
 
@@ -16,6 +17,9 @@ const seedStatuses = async () => {
 
 export const connectDB = async () => {
   try {
+    if (process.env.NODE_ENV === "test") {
+      assertTestDatabase(MONGO_URI)
+    }
     await mongoose.connect(MONGO_URI)
     await seedStatuses()
     console.log("DB is connected")

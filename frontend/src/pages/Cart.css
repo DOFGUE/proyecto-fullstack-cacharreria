@@ -1,0 +1,93 @@
+.cart-layout, .checkout-layout { align-items: start; display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr) 340px; }
+.cart-items, .checkout-items { display: grid; gap: 12px; }
+.cart-item { align-items: center; background: var(--color-white); border-radius: var(--radius-md); display: grid; gap: 16px; grid-template-columns: 90px minmax(0, 1fr) auto; padding: 14px; }
+.cart-item-image { background: #f4f3ef; border-radius: var(--radius-sm); height: 90px; overflow: hidden; }
+.cart-item-image img { height: 100%; object-fit: cover; width: 100%; }
+.cart-item-info h3 { color: var(--color-secondary); font-family: var(--font-heading); font-size: .95rem; margin: 0 0 6px; }
+.cart-item-info p { color: var(--color-muted); font-size: .75rem; margin: 0 0 10px; }
+.cart-quantity { align-items: center; border: 1px solid var(--color-border); border-radius: 7px; display: inline-flex; gap: 14px; padding: 5px 9px; }
+.cart-quantity button, .cart-item-total button { background: none; border: 0; color: var(--color-secondary); display: grid; padding: 2px; place-items: center; }
+.cart-quantity button:disabled { color: #b7bdc1; cursor: not-allowed; }
+.cart-item-total { align-items: end; display: flex; flex-direction: column; gap: 18px; }
+.cart-item-total > strong { color: var(--color-secondary); }
+.cart-item-total > button { color: var(--color-coral); }
+.cart-summary { background: var(--color-white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 24px; position: sticky; top: 20px; }
+.cart-summary h2 { color: var(--color-secondary); font-family: var(--font-heading); font-size: 1.2rem; margin: 9px 0 24px; }
+.summary-row { border-bottom: 1px solid var(--color-border); color: var(--color-muted); display: flex; font-size: .85rem; justify-content: space-between; padding: 12px 0; }
+.summary-row strong { color: var(--color-secondary); }
+.total-row { border: 0; color: var(--color-secondary); font-size: 1rem; font-weight: 700; }
+.full-button { margin-top: 15px; width: 100%; }
+.cart-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+.button-danger { background: #fff0ed; color: var(--color-coral); }
+.checkout-form { background: var(--color-white); border-radius: var(--radius-md); display: grid; gap: 10px; margin-top: 20px; padding: 22px; }
+.checkout-form label { color: var(--color-secondary); font-size: .82rem; font-weight: 700; }
+.checkout-form textarea { border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 12px; resize: vertical; }
+.checkout-form p { color: var(--color-muted); font-size: .76rem; margin: 0 0 8px; }
+@media (max-width: 800px) { .cart-layout, .checkout-layout { grid-template-columns: 1fr; } .cart-summary { position: static; } }
+@media (max-width: 500px) { .cart-item { grid-template-columns: 68px minmax(0, 1fr) auto; padding: 10px; } .cart-item-image { height: 68px; } .cart-item-total { font-size: .8rem; } }
+
+.cart-summary,
+.checkout-form,
+.cart-item {
+  border: 1px solid rgb(232 230 225 / 75%);
+}
+.cart-item {
+  box-shadow: var(--shadow-sm);
+}
+.cart-summary {
+  box-shadow: var(--shadow-md);
+}
+.checkout-form textarea {
+  background: #fdfcf9;
+  color: var(--color-text);
+  line-height: 1.55;
+}
+.checkout-form textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(244 166 42 / 14%);
+  outline: 0;
+}
+.cart-actions .button {
+  min-width: 140px;
+}
+
+@media (max-width: 800px) {
+  .cart-summary {
+    width: 100%;
+  }
+  .checkout-items {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 500px) {
+  .cart-item {
+    align-items: start;
+    gap: 10px;
+    grid-template-columns: 62px minmax(0, 1fr);
+  }
+  .cart-item-image {
+    height: 62px;
+  }
+  .cart-item-info h3 {
+    font-size: .86rem;
+  }
+  .cart-item-total {
+    align-items: center;
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .cart-quantity {
+    gap: 10px;
+  }
+  .cart-actions {
+    justify-content: stretch;
+  }
+  .cart-actions .button {
+    width: 100%;
+  }
+  .checkout-form {
+    padding: 16px;
+  }
+}
