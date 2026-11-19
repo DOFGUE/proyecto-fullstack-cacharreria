@@ -7,6 +7,7 @@ export default function AdminProductForm({ open, product, subCategories, saving,
     name: "",
     description: "",
     price: "",
+    discountPercent: 0,
     stock: "",
     image: ""
   })
@@ -20,6 +21,7 @@ export default function AdminProductForm({ open, product, subCategories, saving,
       name: product?.name || "",
       description: product?.description || "",
       price: product?.price ?? "",
+      discountPercent: product?.discountPercent ?? 0,
       stock: product?.stock ?? "",
       image: product?.image || ""
     })
@@ -53,6 +55,7 @@ export default function AdminProductForm({ open, product, subCategories, saving,
     if (!form.subCategory) return setError("Selecciona una subcategoría")
     if (!form.name.trim()) return setError("El nombre es obligatorio")
     if (form.price === "" || Number(form.price) < 0) return setError("Ingresa un precio válido")
+    if (form.discountPercent === "" || Number(form.discountPercent) < 0 || Number(form.discountPercent) > 100) return setError("Ingresa un descuento entre 0 y 100")
     if (form.stock === "" || !Number.isInteger(Number(form.stock)) || Number(form.stock) < 0) return setError("Ingresa un stock entero válido")
 
     const payload = {
@@ -60,6 +63,7 @@ export default function AdminProductForm({ open, product, subCategories, saving,
       name: form.name.trim(),
       description: form.description.trim(),
       price: Number(form.price),
+      discountPercent: Number(form.discountPercent),
       stock: Number(form.stock)
     }
     if (form.image) payload.image = form.image
@@ -80,6 +84,7 @@ export default function AdminProductForm({ open, product, subCategories, saving,
             <label>Subcategoría<select name="subCategory" value={form.subCategory} onChange={setField}><option value="">Selecciona una subcategoría</option>{subCategories.map((item) => <option key={item._id} value={item._id}>{item.name}{item.category?.name ? ` - ${item.category.name}` : ""}</option>)}</select></label>
             <label className="admin-form-full">Descripción<textarea name="description" value={form.description} onChange={setField} rows={3} /></label>
             <label>Precio (COP)<input name="price" type="number" min="0" step="1" value={form.price} onChange={setField} /></label>
+            <label>Descuento (%)<input name="discountPercent" type="number" min="0" max="100" step="1" value={form.discountPercent} onChange={setField} /></label>
             <label>Existencias<input name="stock" type="number" min="0" step="1" value={form.stock} onChange={setField} /></label>
             <label className="admin-form-full">Imagen JPEG, PNG o WebP<input type="file" accept="image/jpeg,image/png,image/webp" onChange={readImage} /></label>
           </div>

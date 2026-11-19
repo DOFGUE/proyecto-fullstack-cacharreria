@@ -5,6 +5,8 @@ export const getId = (value) => value?._id || value?.id || value
 export const normalizeProduct = (product) => {
   const subCategory = product.subCategory || {}
   const category = subCategory.category || {}
+  const price = Number(product.price) || 0
+  const discountPercent = Number(product.discountPercent) || 0
   return {
     ...product,
     id: product._id,
@@ -13,8 +15,11 @@ export const normalizeProduct = (product) => {
     subCategoryName: subCategory.name || "Sin subcategoría",
     subCategoryId: getId(subCategory),
     image: product.image || FALLBACK_IMAGE,
-    price: Number(product.price) || 0,
-    stock: Number(product.stock) || 0
+    price,
+    stock: Number(product.stock) || 0,
+    discountPercent,
+    oldPrice: discountPercent > 0 ? Math.round(price / (1 - discountPercent / 100)) : undefined,
+    tag: discountPercent > 0 ? "Oferta" : product.tag
   }
 }
 

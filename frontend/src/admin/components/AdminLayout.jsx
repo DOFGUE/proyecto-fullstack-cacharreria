@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom"
-import { Boxes, ChevronRight, ExternalLink, LayoutDashboard, LogOut, Menu, PackageSearch, Shapes, Tags, X } from "lucide-react"
+import { Boxes, ChevronRight, ExternalLink, LayoutDashboard, LogOut, Menu, PackageSearch, Shapes, ShoppingCart, Tags, X } from "lucide-react"
 import toast from "react-hot-toast"
 import { useAuth } from "../../context/AuthContext"
 import "./admin.css"
@@ -10,6 +10,7 @@ const links = [
   { to: "/admin/productos", label: "Productos", icon: Boxes },
   { to: "/admin/categorias", label: "Categorías", icon: Tags },
   { to: "/admin/subcategorias", label: "Subcategorías", icon: Shapes },
+  { to: "/admin/pedidos", label: "Pedidos", icon: ShoppingCart },
   { to: "/admin/inventario", label: "Inventario", icon: PackageSearch }
 ]
 

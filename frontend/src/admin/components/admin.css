@@ -133,6 +133,15 @@
   .admin-menu-button { background: none; border: 0; color: var(--color-secondary); display: grid; padding: 7px; }
   .admin-content { padding: 22px 16px; }
 }
+.admin-order-filters { margin-bottom: 14px; }
+.admin-orders-table { min-width: 860px; }
+.admin-order-date { color: var(--color-muted); display: block; font-size: .68rem; margin-top: 3px; }
+.admin-order-status { border-radius: 20px; display: inline-block; font-size: .68rem; font-weight: 700; padding: 6px 9px; white-space: nowrap; }
+.admin-order-status.shop { background: #fff1d2; color: #9a6a10; }
+.admin-order-status.sent { background: #ddeaf6; color: #3e6685; }
+.admin-order-status.delivered { background: #e2f0e8; color: #34754f; }
+.admin-order-action { min-height: 34px; padding: 7px 10px; white-space: nowrap; }
+.admin-order-complete { align-items: center; color: #34754f; display: inline-flex; gap: 5px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
 @media (max-width: 560px) {
   .admin-header-account div { display: none; }
   .admin-header-account button span { display: none; }

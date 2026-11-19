@@ -12,6 +12,7 @@ const nextStatus = {
 
 const billPopulate = (query) => query
   .populate("status")
+  .populate("user", "username lastName email")
   .populate({ path: "cartItems", populate: "item" })
 
 const invalidId = (id) => !mongoose.Types.ObjectId.isValid(id)
@@ -88,6 +89,14 @@ export const createBill = async (req, res) => {
 export const getBills = async (req, res) => {
   try {
     return res.json(await billPopulate(Bill.find({ user: req.user.id }).sort({ date: -1 })))
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
+}
+
+export const getAllBills = async (req, res) => {
+  try {
+    return res.json(await billPopulate(Bill.find().sort({ date: -1 })))
   } catch (error) {
     return res.status(500).json({ message: error.message })
   }

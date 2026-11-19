@@ -64,6 +64,7 @@ export default function AdminDashboard() {
                 <Link to="/admin/productos"><Boxes /><span><strong>Productos</strong><small>Crear, editar y eliminar</small></span></Link>
                 <Link to="/admin/categorias"><Tags /><span><strong>Categorías</strong><small>Organizar el catálogo</small></span></Link>
                 <Link to="/admin/subcategorias"><Shapes /><span><strong>Subcategorías</strong><small>Relacionarlas con categorías</small></span></Link>
+                <Link to="/admin/pedidos"><PackageSearch /><span><strong>Pedidos</strong><small>Avanzar estados de entrega</small></span></Link>
               </div>
             </section>
           </div>

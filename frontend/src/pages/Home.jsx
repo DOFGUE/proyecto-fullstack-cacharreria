@@ -5,7 +5,7 @@ import Footer from "../components/layout/Footer"
 import Header from "../components/layout/Header"
 import ProductCard from "../components/products/ProductCard"
 import { getCategories } from "../services/category.service"
-import { getProducts } from "../services/product.service"
+import { getBestSellers, getOffers, getProducts } from "../services/product.service"
 import { ErrorState, LoadingState } from "../components/common/AsyncState"
 import { FALLBACK_IMAGE, getErrorMessage, normalizeProduct } from "../utils/catalog"
 
@@ -17,11 +17,11 @@ const benefits = [
 ]
 
 export default function Home() {
-  const [catalog, setCatalog] = useState({ loading: true, error: "", categories: [], products: [] })
+  const [catalog, setCatalog] = useState({ loading: true, error: "", categories: [], products: [], offers: [], bestSellers: [] })
 
   useEffect(() => {
     let active = true
-    setCatalog((current) => ({ ...current, loading: true, error: "", categories: [], products: [] }))
+    setCatalog((current) => ({ ...current, loading: true, error: "", categories: [], products: [], offers: [], bestSellers: [] }))
 
     getCategories()
       .then((categories) => {
@@ -39,6 +39,18 @@ export default function Home() {
           products: productResponse.products.map(normalizeProduct)
         }))
       })
+
+    getOffers()
+      .then((products) => {
+        if (active) setCatalog((current) => ({ ...current, offers: products.map(normalizeProduct) }))
+      })
+      .catch(() => {})
+
+    getBestSellers()
+      .then((products) => {
+        if (active) setCatalog((current) => ({ ...current, bestSellers: products.map(normalizeProduct) }))
+      })
+      .catch(() => {})
       .catch((error) => {
         if (active) setCatalog((current) => ({
           ...current,
@@ -84,15 +96,15 @@ export default function Home() {
 
         <section className="section" id="ofertas">
           <div className="container">
-            <div className="section-heading"><div><span className="eyebrow">Precios que alegran</span><h2>Ofertas especiales</h2><p>Las ofertas aparecerán cuando existan descuentos registrados.</p></div></div>
-            <div className="placeholder"><Sparkles /><strong>No hay ofertas disponibles.</strong><p>Las promociones aparecerán aquí cuando existan descuentos registrados.</p></div>
+            <div className="section-heading"><div><span className="eyebrow">Precios que alegran</span><h2>Ofertas especiales</h2><p>Descuentos configurados desde el panel administrativo.</p></div><Link className="text-link" to="/ofertas">Ver ofertas <ArrowRight size={15} /></Link></div>
+            {catalog.loading ? <LoadingState label="Cargando ofertas..." /> : catalog.offers.length ? <div className="products-grid">{catalog.offers.slice(0, 4).map((product) => <ProductCard key={product.id} product={product} />)}</div> : <div className="placeholder"><Sparkles /><strong>No hay ofertas disponibles.</strong><p>Configura un porcentaje de descuento en un producto activo.</p></div>}
           </div>
         </section>
 
         <section className="section soft-section">
           <div className="container">
-            <div className="section-heading"><div><span className="eyebrow">Próximamente</span><h2>Los más vendidos</h2><p>Preparado para mostrar datos reales de compras.</p></div></div>
-            <div className="placeholder"><Sparkles /><strong>Esta sección se conectará cuando exista la métrica de ventas.</strong><p>No se muestran estadísticas ficticias. El espacio ya está listo para la siguiente fase.</p></div>
+            <div className="section-heading"><div><span className="eyebrow">Favoritos de nuestros clientes</span><h2>Los más vendidos</h2><p>Basado en unidades incluidas en pedidos entregados.</p></div><Link className="text-link" to="/mas-vendidos">Ver más vendidos <ArrowRight size={15} /></Link></div>
+            {catalog.loading ? <LoadingState label="Calculando más vendidos..." /> : catalog.bestSellers.length ? <div className="products-grid">{catalog.bestSellers.slice(0, 4).map((product) => <ProductCard key={product.id} product={product} />)}</div> : <div className="placeholder"><Sparkles /><strong>Aún no hay ventas entregadas.</strong><p>Los rankings aparecerán cuando existan pedidos completados.</p></div>}
           </div>
         </section>
 

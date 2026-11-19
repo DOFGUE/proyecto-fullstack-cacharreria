@@ -25,6 +25,7 @@ import AdminProducts from "../admin/pages/AdminProducts"
 import AdminCategories from "../admin/pages/AdminCategories"
 import AdminSubcategories from "../admin/pages/AdminSubcategories"
 import AdminInventory from "../admin/pages/AdminInventory"
+import AdminOrders from "../admin/pages/AdminOrders"
 
 export default function AppRouter() {
   return <BrowserRouter><Routes>
@@ -52,6 +53,7 @@ export default function AppRouter() {
           <Route path="productos" element={<AdminProducts />} />
           <Route path="categorias" element={<AdminCategories />} />
           <Route path="subcategorias" element={<AdminSubcategories />} />
+          <Route path="pedidos" element={<AdminOrders />} />
           <Route path="inventario" element={<AdminInventory />} />
         </Route>
       </Route>
