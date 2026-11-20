@@ -19,6 +19,7 @@ export default function ProductDetail() {
   const [adding, setAdding] = useState(false)
   useEffect(() => {
     let active = true
+    setQuantity(1)
     getProduct(id)
       .then((response) => { if (active) setState({ loading: false, error: "", product: normalizeProduct(response) }) })
       .catch((error) => { if (active) setState({ loading: false, error: getErrorMessage(error), product: null }) })
@@ -31,6 +32,14 @@ export default function ProductDetail() {
   const addToCart = async () => {
     if (!isAuthenticated) {
       navigate("/login")
+      return
+    }
+    if (quantity < 1 || quantity > product.stock) {
+      toast.error("Selecciona una cantidad disponible")
+      return
+    }
+    if (product.stock < 1) {
+      toast.error("Este producto está agotado")
       return
     }
     setAdding(true)

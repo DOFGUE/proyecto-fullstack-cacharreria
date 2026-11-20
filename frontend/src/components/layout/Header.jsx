@@ -61,7 +61,7 @@ export default function Header() {
             </Link>}
             <Link className="header-action cart-button" to="/carrito">
               <ShoppingBag />
-              <i className="cart-count">{itemCount}</i>
+              <i key={itemCount} className="cart-count">{itemCount}</i>
               <span><small>Tu carrito</small><strong>{itemCount > 0 ? `${itemCount} producto${itemCount === 1 ? "" : "s"}` : "Vacío"}</strong></span>
             </Link>
           </div>
