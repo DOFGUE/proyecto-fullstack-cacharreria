@@ -26,6 +26,7 @@ import AdminCategories from "../admin/pages/AdminCategories"
 import AdminSubcategories from "../admin/pages/AdminSubcategories"
 import AdminInventory from "../admin/pages/AdminInventory"
 import AdminOrders from "../admin/pages/AdminOrders"
+import StubPage from "../pages/StubPage"
 
 export default function AppRouter() {
   return <BrowserRouter><Routes>
@@ -40,6 +41,8 @@ export default function AppRouter() {
     <Route path="/registro" element={<Register />} />
     <Route path="/contacto" element={<Contact />} />
     <Route path="/preguntas-frecuentes" element={<FAQ />} />
+    <Route path="/privacidad" element={<StubPage title="Privacidad" description="Información sobre privacidad disponible próximamente." />} />
+    <Route path="/terminos" element={<StubPage title="Términos y condiciones" description="Los términos comerciales se configurarán antes de publicar la tienda." />} />
     <Route path="/acceso-denegado" element={<AccessDenied />} />
     <Route element={<ProtectedRoute />}>
       <Route path="/perfil" element={<Profile />} />

@@ -1,59 +1,76 @@
 # Proyecto Cacharrería
 
-API de comercio para productos, categorías, usuarios, carrito y facturas, construida con Express y MongoDB. El frontend se agregará en la carpeta `frontend/`.
+Aplicación fullstack para gestionar el catálogo, usuarios, carrito, checkout y pedidos de una cacharrería. Incluye una tienda pública construida con React y un panel administrativo protegido por rol.
+
+## Tecnologías
+
+- Frontend: React 19, Vite, React Router, Axios, React Hook Form, Zod, Lucide React y React Hot Toast.
+- Backend: Node.js, Express, MongoDB, Mongoose, JWT y Zod.
+- Base de datos: MongoDB local con Replica Set o MongoDB Atlas.
+
+## Estructura
+
+```text
+backend/
+  src/controllers/
+  src/models/
+  src/routers/
+  src/schema/
+  src/middlewares/
+  scripts/
+  test/
+frontend/
+  src/components/
+  src/pages/
+  src/admin/
+  src/context/
+  src/services/
+  src/routes/
+  src/styles/
+  src/utils/
+```
 
 ## Requisitos
 
-- Node.js 18 o superior y npm.
-- Una instancia accesible de MongoDB.
+- Node.js 18 o superior.
+- npm.
+- MongoDB Community Server o MongoDB Atlas.
+- MongoDB configurado como Replica Set para crear pedidos con transacciones.
 
-## Preparar y ejecutar
+## Instalación
 
-1. Instala Node.js 18 o superior, npm y MongoDB Community Server, o configura una URI de MongoDB Atlas.
-2. Desde `backend`, ejecuta `npm install`.
-3. Copia `backend/.env.example` como `backend/.env` y configura un `TOKEN_SECRET` aleatorio de al menos 32 caracteres. El archivo `.env` es local y no debe subirse a GitHub.
-4. Desde `backend`, ejecuta `npm run dev`.
-5. Cuando aparezca `DB is connected` y el servidor indique el puerto, la API estará en `http://localhost:4000`.
-
-Consulta [backend/README.md](backend/README.md) para los endpoints, autenticación, Replica Set y carga de productos.
-
-## Estructura del proyecto
-
-```text
-backend/   API Express, MongoDB, autenticación y lógica de negocio.
-frontend/  Aplicación cliente que consumirá la API.
+```bash
+cd backend
+npm install
+npm run dev
 ```
 
-El frontend debe ejecutarse como una aplicación independiente y usar
-`http://localhost:4000` como URL base de la API. Como la autenticación usa cookies,
-las peticiones autenticadas deben enviar credenciales (`credentials: "include"` en
-Fetch o la opción equivalente en Axios). El origen del frontend debe estar incluido
-en `backend/.env` dentro de `FRONTEND_ORIGINS`.
+En otra terminal:
 
-## MongoDB local como Replica Set
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-El backend usa transacciones al crear facturas para descontar inventario, guardar la
-factura y renovar el carrito de forma atómica. Por eso la instancia local debe usar
-un Replica Set, incluso si tiene un solo nodo.
+El frontend utiliza `http://localhost:4000/api` en desarrollo normal. El backend escucha en `http://localhost:4000`.
 
-En Linux, edita `/etc/mongod.conf` y agrega:
+## MongoDB local
+
+Ejemplo de URI:
+
+```text
+MONGO_URI=mongodb://127.0.0.1:27017/proyecto_cacharreria?replicaSet=rs0
+```
+
+MongoDB debe iniciar con:
 
 ```yaml
 replication:
   replSetName: rs0
 ```
 
-Reinicia MongoDB:
-
-```bash
-sudo systemctl restart mongod
-```
-
-Inicializa el Replica Set una sola vez:
-
-```bash
-mongosh
-```
+Después, si el Replica Set no ha sido iniciado:
 
 ```javascript
 rs.initiate({
@@ -62,23 +79,65 @@ rs.initiate({
 })
 ```
 
-Comprueba que el nodo sea `PRIMARY`:
+## Configuración
 
-```javascript
-rs.status()
+Copia los archivos de ejemplo sin publicar secretos reales:
+
+```text
+backend/.env.example
+backend/.env.test.example
+frontend/.env.example
 ```
 
-La URI debe incluir el nombre del Replica Set:
+No subas `.env`, tokens, contraseñas ni cadenas de conexión reales.
 
-```env
-MONGO_URI=mongodb://127.0.0.1:27017/proyecto_cacharreria?replicaSet=rs0
+## Funcionalidades
+
+- Catálogo, búsqueda, filtros, ordenamiento y paginación.
+- Categorías, subcategorías, ofertas y más vendidos.
+- Vista rápida y detalle de producto.
+- Registro, login, perfil y logout con cookies HTTP-only.
+- Carrito sincronizado con el backend.
+- Checkout y pedidos transaccionales.
+- Historial y detalle de pedidos.
+- Administración de productos, categorías, subcategorías, inventario y pedidos.
+
+## Usuarios de prueba
+
+El proyecto contiene fixtures aislados documentados en `backend/scripts/setup-test-db.js`.
+
+Cuentas disponibles en el entorno de pruebas:
+
+```text
+Administrador
+Correo: test-admin@local.invalid
+Contraseña: TestOnlyAdmin!2026
+
+Usuario normal
+Correo: test-user@local.invalid
+Contraseña: TestOnlyUser!2026
 ```
 
-Si MongoDB muestra `ECONNREFUSED`, revisa `sudo systemctl status mongod`.
-Si aparece un error de transacciones indicando que no se permiten en un servidor
-standalone, comprueba que `rs.status()` muestre un nodo `PRIMARY` y que la URI tenga
-`?replicaSet=rs0`. MongoDB Atlas ya incluye Replica Set y no requiere estos pasos.
+Estas credenciales son exclusivamente para desarrollo y pruebas en `proyecto_cacharreria_test`.
 
-## Contribuir
+## Compilación y pruebas
 
-La rama de trabajo es `main`. Antes de enviar cambios, revisa `git status`, crea una rama y no incluyas credenciales, archivos `.env`, dependencias ni datos privados.
+```bash
+cd frontend
+npm run build
+```
+
+```bash
+cd backend
+npm test
+```
+
+Para preparar el entorno aislado:
+
+```bash
+cd backend
+npm run setup:test
+npm run dev:test
+```
+
+No ejecutes los scripts de fixtures contra la base de producción.
