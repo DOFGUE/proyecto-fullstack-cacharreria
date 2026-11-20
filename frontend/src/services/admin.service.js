@@ -44,13 +44,3 @@ export const deleteSubCategory = async (id) => {
   const response = await api.delete(`/subcategories/${id}`)
   return response.data
 }
-
-export const getBills = async () => {
-  const response = await api.get("/bills/admin")
-  return response.data
-}
-
-export const updateBillStatus = async (id, status) => {
-  const response = await api.patch(`/bills/${id}/status`, { status })
-  return response.data
-}

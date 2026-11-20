@@ -3,15 +3,15 @@ import { Sparkles } from "lucide-react"
 import PageLayout from "../components/layout/PageLayout"
 import PageHeader from "../components/common/PageHeader"
 import ProductCard from "../components/products/ProductCard"
-import { getOffers } from "../services/product.service"
+import { getProducts } from "../services/product.service"
 import { getErrorMessage, normalizeProduct } from "../utils/catalog"
 import { ErrorState, LoadingState } from "../components/common/AsyncState"
 export default function Offers() {
   const [state, setState] = useState({ loading: true, error: "", products: [] })
   useEffect(() => {
     let active = true
-    getOffers().then((products) => {
-      if (active) setState({ loading: false, error: "", products: products.map(normalizeProduct) })
+    getProducts({ limit: 100 }).then(({ products }) => {
+      if (active) setState({ loading: false, error: "", products: products.map(normalizeProduct).filter((product) => Object.hasOwn(product, "oldPrice")) })
     }).catch((error) => { if (active) setState({ loading: false, error: getErrorMessage(error), products: [] }) })
     return () => { active = false }
   }, [])

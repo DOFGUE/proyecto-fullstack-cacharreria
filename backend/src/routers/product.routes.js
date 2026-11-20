@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { getProducts, getProduct, getOffers, getBestSellers, createProduct, createProducts, updateProduct, deleteProduct } from "../controllers/product.controller.js"
+import { getProducts, getProduct, createProduct, createProducts, updateProduct, deleteProduct } from "../controllers/product.controller.js"
 import { authRequired } from "../middlewares/validateToken.js"
 import { adminRequired } from "../middlewares/admin.middleware.js"
 import { validateSchema } from "../middlewares/validator.middleware.js"
@@ -8,8 +8,6 @@ import { bulkProductSchema, productSchema } from "../schema/product.schema.js"
 const router = Router()
 
 router.get("/products", getProducts)
-router.get("/products/offers", getOffers)
-router.get("/products/best-sellers", getBestSellers)
 router.get("/products/:id", getProduct)
 router.post("/products", authRequired, adminRequired, validateSchema(productSchema), createProduct)
 router.post("/products/bulk", authRequired, adminRequired, validateSchema(bulkProductSchema), createProducts)
