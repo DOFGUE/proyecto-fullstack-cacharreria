@@ -1,6 +1,9 @@
 import Item from "../models/item.model.js"
 import mongoose from "mongoose"
 import SubCategory from "../models/subCategory.model.js"
+import Bill from "../models/bill.model.js"
+import CartItem from "../models/cartItem.model.js"
+import Status from "../models/status.model.js"
 import "../models/category.model.js"
 import "../models/subCategory.model.js"
 
@@ -63,6 +66,49 @@ export const getProduct = async (req, res) => {
     const product = await Item.findById(req.params.id).populate({ path: "subCategory", populate: "category" })
     if (!product) return res.status(404).json({ message: "Product not found" })
     return res.json(product)
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
+}
+
+export const getOffers = async (req, res) => {
+  try {
+    const products = await Item.find({ discountPercent: { $gt: 0 }, stock: { $gt: 0 } })
+      .populate({ path: "subCategory", populate: "category" })
+      .sort({ discountPercent: -1, createdAt: -1 })
+      .limit(100)
+    return res.json(products)
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
+}
+
+export const getBestSellers = async (req, res) => {
+  try {
+    const deliveredStatus = await Status.findOne({ name: "entregado" })
+    if (!deliveredStatus) return res.json([])
+
+    const bills = await Bill.find({ status: deliveredStatus._id }).select("cartItems").lean()
+    const cartItemIds = bills.flatMap((bill) => bill.cartItems)
+    if (!cartItemIds.length) return res.json([])
+
+    const quantities = await CartItem.aggregate([
+      { $match: { _id: { $in: cartItemIds } } },
+      { $group: { _id: "$item", sold: { $sum: "$quantity" } } },
+      { $sort: { sold: -1 } },
+      { $limit: 100 }
+    ])
+
+    if (!quantities.length) return res.json([])
+    const products = await Item.find({ _id: { $in: quantities.map((entry) => entry._id) } })
+      .populate({ path: "subCategory", populate: "category" })
+
+    const soldByProduct = new Map(quantities.map((entry) => [String(entry._id), entry.sold]))
+    const ranked = products
+      .map((product) => ({ ...product.toObject(), soldQuantity: soldByProduct.get(String(product._id)) || 0 }))
+      .sort((a, b) => b.soldQuantity - a.soldQuantity)
+
+    return res.json(ranked)
   } catch (error) {
     return res.status(500).json({ message: error.message })
   }

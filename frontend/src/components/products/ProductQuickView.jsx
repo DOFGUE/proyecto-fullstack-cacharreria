@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { Minus, Plus, X } from "lucide-react"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
 import { FALLBACK_IMAGE, formatPrice } from "../../utils/catalog"
 import { useAuth } from "../../context/AuthContext"
@@ -70,7 +71,7 @@ export default function ProductQuickView({ product, onClose }) {
     }
   }
 
-  return (
+  const modal = (
     <div className={`quick-view-backdrop ${closing ? "is-closing" : ""}`} onMouseDown={closeModal} role="presentation">
       <section
         className="quick-view"
@@ -118,11 +119,10 @@ export default function ProductQuickView({ product, onClose }) {
               {adding ? "Agregando..." : product.stock < 1 ? "Agotado" : "Agregar al carrito"}
             </button>
           </div>
-          <Link className="quick-view-detail" to={`/producto/${product.id}`} onClick={closeModal}>
-            Ver página completa
-          </Link>
         </div>
       </section>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }

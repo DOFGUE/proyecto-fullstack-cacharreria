@@ -17,3 +17,6 @@ export const getProduct = async (id) => {
   const response = await api.get(`/products/${id}`)
   return response.data
 }
+
+export const getOffers = async () => (await api.get("/products/offers")).data
+export const getBestSellers = async () => (await api.get("/products/best-sellers")).data

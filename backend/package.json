@@ -9,6 +9,7 @@
     "start": "node src/index.js",
     "dev:test": "node scripts/run-test-backend.js",
     "seed:catalog": "node scripts/seed-catalog.js",
+    "seed:category-images": "node scripts/seed-category-images.js",
     "setup:test": "node scripts/setup-test-db.js",
     "cleanup:test": "node scripts/cleanup-test-db.js",
     "test": "node --test test/*.test.js",

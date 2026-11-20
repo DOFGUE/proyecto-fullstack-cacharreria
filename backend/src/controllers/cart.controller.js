@@ -2,6 +2,7 @@ import mongoose from "mongoose"
 import Cart from "../models/cart.model.js"
 import CartItem from "../models/cartItem.model.js"
 import Item from "../models/item.model.js"
+import { getDiscountedPrice } from "../utils/pricing.js"
 
 const getOrCreateCart = (userId) => Cart.findOneAndUpdate(
   { user: userId },
@@ -17,7 +18,18 @@ const updateCartTotal = async (cartId) => {
 
 const cartResponse = async (cart) => {
   const items = await CartItem.find({ cart: cart._id }).populate("item")
-  return { cart, items }
+  let changed = false
+  for (const cartItem of items) {
+    if (!cartItem.item) continue
+    const discountedPrice = getDiscountedPrice(cartItem.item.price, cartItem.item.discountPercent)
+    if (cartItem.price !== discountedPrice) {
+      cartItem.price = discountedPrice
+      await cartItem.save()
+      changed = true
+    }
+  }
+  const updatedCart = changed ? await updateCartTotal(cart._id) : cart
+  return { cart: updatedCart, items }
 }
 
 const invalidId = (id) => !mongoose.Types.ObjectId.isValid(id)
@@ -45,10 +57,15 @@ export const addCartItem = async (req, res) => {
 
     if (existingItem) {
       existingItem.quantity = quantity
-      existingItem.price = product.price
+      existingItem.price = getDiscountedPrice(product.price, product.discountPercent)
       await existingItem.save()
     } else {
-      await CartItem.create({ cart: cart._id, item: product._id, price: product.price, quantity })
+      await CartItem.create({
+        cart: cart._id,
+        item: product._id,
+        price: getDiscountedPrice(product.price, product.discountPercent),
+        quantity
+      })
     }
 
     const updatedCart = await updateCartTotal(cart._id)
@@ -72,7 +89,7 @@ export const updateCartItem = async (req, res) => {
     }
 
     cartItem.quantity = req.body.quantity
-    cartItem.price = cartItem.item.price
+    cartItem.price = getDiscountedPrice(cartItem.item.price, cartItem.item.discountPercent)
     await cartItem.save()
     const updatedCart = await updateCartTotal(cart._id)
     return res.json(await cartResponse(updatedCart))

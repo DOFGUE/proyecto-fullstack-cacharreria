@@ -1,8 +1,8 @@
 export const demoCategories = [
-  { id: "cocina", name: "Cocina y mesa", icon: "🍳", image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=700&q=80" },
-  { id: "aseo", name: "Aseo y limpieza", icon: "🧽", image: "https://images.unsplash.com/photo-1583947215259-38e31be8751f?auto=format&fit=crop&w=700&q=80" },
-  { id: "organizacion", name: "Organización", icon: "🧺", image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=700&q=80" },
-  { id: "papeleria", name: "Papelería", icon: "✏️", image: "https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?auto=format&fit=crop&w=700&q=80" }
+  { id: "cocina", name: "Cocina y mesa", image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=700&q=80" },
+  { id: "aseo", name: "Aseo y limpieza", image: "https://images.unsplash.com/photo-1583947215259-38e31be8751f?auto=format&fit=crop&w=700&q=80" },
+  { id: "organizacion", name: "Organización", image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=700&q=80" },
+  { id: "papeleria", name: "Papelería", image: "https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?auto=format&fit=crop&w=700&q=80" }
 ]
 
 export const demoProducts = [
